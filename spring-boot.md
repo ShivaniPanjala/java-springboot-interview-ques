@@ -78,9 +78,12 @@
 │  → Adds health checks, metrics, initialization     │
 └────────────────────────────────────────────────────┘
 ```
+---
 
+
+````markdown
 ## Explain Spring Boot starter parent and dependency management?
-Spring Boot Starter Parent = a ready-made parent POM with defaults + dependency management.
+Spring Boot Starter Parent = a ready-made parent POM with defaults + dependency management.  
 Dependency Management = Spring Boot’s curated list of dependency versions, ensuring compatibility and reducing boilerplate.
 
 ## 1. Spring Boot Starter Parent
@@ -98,12 +101,12 @@ You include it in your `pom.xml` like this:
     <artifactId>spring-boot-starter-parent</artifactId>
     <version>3.3.5</version> <!-- example version -->
 </parent>
-````
+```
 
 ### 🧭 What It Does
 
-* Sets **default plugin versions** (no need to specify them manually).
-* Manages **dependency versions** through a built-in dependency management section.
+* Sets **default plugin versions** (no need to specify them manually).  
+* Manages **dependency versions** through a built-in dependency management section.  
 * Provides **default configuration values**, such as:
 
 ```xml
@@ -122,7 +125,7 @@ You include it in your `pom.xml` like this:
 
 Dependency management in Spring Boot (through the parent POM) means:
 
-* You **don’t have to specify versions** for most Spring dependencies.
+* You **don’t have to specify versions** for most Spring dependencies.  
 * Spring Boot manages versions for you via its curated **dependency management section**.
 
 Example:
@@ -164,9 +167,6 @@ If you **don’t** want to use the `spring-boot-starter-parent`, you can still g
 
 This is useful when:
 
-* You already have a custom parent POM.
+* You already have a custom parent POM.  
 * You just want the dependency management benefits without inheriting plugin configurations or default properties.
-
-
-
-```
+````
