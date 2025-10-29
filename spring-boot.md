@@ -1,4 +1,5 @@
 ## How does Spring Boot autoconfiguration pick the right DataSource bean?
+```
 ┌────────────────────────────────────────────────────┐
 │ 1️⃣ @SpringBootApplication                           │
 │ └─ Combines:                                        │
@@ -76,6 +77,7 @@
 │   • DataSourcePoolMetadataProvidersConfiguration   │
 │  → Adds health checks, metrics, initialization     │
 └────────────────────────────────────────────────────┘
+```
 
 ## Explain Spring Boot starter parent and dependency management?
 Spring Boot Starter Parent = a ready-made parent POM with defaults + dependency management.
