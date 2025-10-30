@@ -56,11 +56,11 @@ In banking, data integrity is paramount, so the isolation level chosen is extrem
 
 ## For Money Transfers (Write Operations):
 
-The SERIALIZABLE isolation level is often preferred for critical transactions like transferring money from Account A to Account B. This level ensures that the concurrent execution of transactions is equivalent to some serial (one-at-a-time) execution, preventing all anomalies. This guarantees that the money that leaves Account A arrives intact at Account B with no interference.
+The ***SERIALIZABLE*** isolation level is often preferred for critical transactions like transferring money from Account A to Account B. This level ensures that the concurrent execution of transactions is equivalent to some serial (one-at-a-time) execution, preventing all anomalies. This guarantees that the money that leaves Account A arrives intact at Account B with no interference.
 
-Some systems might use REPEATABLE READ combined with explicit locking (like SELECT ... FOR UPDATE) on the specific account records being modified to achieve high consistency for the critical path while potentially allowing better concurrency on other parts of the system.
+Some systems might use ***REPEATABLE READ*** combined with explicit locking (like SELECT ... FOR UPDATE) on the specific account records being modified to achieve high consistency for the critical path while potentially allowing better concurrency on other parts of the system.
 
 ## For Simple Reads (Reporting/Display):
 
-READ COMMITTED is a very common default for many database systems (like PostgreSQL) and is often used for non-critical reads, such as checking an account balance for display. It prevents reading uncommitted changes, ensuring all data seen is "real" (committed). It tolerates non-repeatable reads, meaning if you check your balance twice in a long transaction, it might change if another transaction commits in between
+***READ COMMITTED*** is a very common default for many database systems (like PostgreSQL) and is often used for non-critical reads, such as checking an account balance for display. It prevents reading uncommitted changes, ensuring all data seen is "real" (committed). It tolerates non-repeatable reads, meaning if you check your balance twice in a long transaction, it might change if another transaction commits in between
 
