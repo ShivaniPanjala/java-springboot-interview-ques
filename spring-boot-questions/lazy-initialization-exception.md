@@ -1,4 +1,4 @@
-How to Debug LazyInitializationException in JPA/Hibernate
+## How to Debug LazyInitializationException in JPA/Hibernate
 
 A `LazyInitializationException` occurs when you try to access a **lazy-loaded association** (like a `@OneToMany` or `@ManyToOne`) **after the Hibernate session has been closed** — meaning Hibernate can’t fetch the data it deferred.
 
