@@ -266,10 +266,10 @@ SELECT * FROM Employees WHERE Salary > 70000;
 -- Result: 11 rows  
 ``` 
 
-| **Type** | **What Changed?** | **Example** | **Prevented By** |
-|-----------|------------------|--------------|------------------|
-| **Non-Repeatable Read** | The **value** of an existing record changed | Account balance updated mid-transaction | `REPEATABLE_READ` |
-| **Phantom Read** | The **number of rows** in the query result changed | New employee inserted into query range | `SERIALIZABLE` |
+| **Type**                | **What Changed?**                                    | **Example**                             | **Prevented By** |
+|-------------------------|------------------------------------------------------|-----------------------------------------|------------------|
+| **Non-Repeatable Read** | The **value** of an existing record changed          | Account balance updated mid-transaction | `REPEATABLE_READ`|
+| **Phantom Read**        | The **number of rows** in the query result changed   | New employee inserted into query range  | `SERIALIZABLE`   |
 
 
 
