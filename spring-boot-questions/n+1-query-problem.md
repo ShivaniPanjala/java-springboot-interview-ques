@@ -10,12 +10,12 @@ This problem occurs when an ORM framework executes one initial query (N=1) to re
 - There are two primary ways to fix this in Spring Data JPA:
 
     1. **For Complex Queries** : 
-        - Use ****@Query**** with the ****JOIN FETCH****@ clause. 
+        - Use **@Query** with the **JOIN FETCH** clause. 
         - This forces Hibernate to load the parent and children in a single, efficient query 
-        - (SELECT p FROM Parent p JOIN FETCH p.children)
+            - SELECT p FROM Parent p JOIN FETCH p.children
         - completely eliminating the N separate lookups.
 
     2. **For Repository-Level Control** : 
-        - Use the ****@EntityGraph****@ annotation on your repository method. 
+        - Use the **@EntityGraph** annotation on your repository method. 
         - This is a cleaner, more declarative way to specify which relationships must be eagerly loaded,
         - ensuring the data is fetched in one optimized query without writing complex SQL.
