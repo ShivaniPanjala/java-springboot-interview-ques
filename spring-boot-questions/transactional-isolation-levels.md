@@ -49,6 +49,26 @@ SELECT * FROM Employees WHERE Salary > 70000;
 | **Non-Repeatable Read** | The **value** of an existing record changed          | Account balance updated mid-transaction | `REPEATABLE_READ`|
 | **Phantom Read**        | The **number of rows** in the query result changed   | New employee inserted into query range  | `SERIALIZABLE`   |
 
+# 🧩 Isolation Levels vs Read Anomalies
+
+| **Isolation Level**     | **Dirty Read** | **Non-Repeatable Read** | **Phantom Read** | **Description / Behavior** |
+|--------------------------|----------------|--------------------------|------------------|-----------------------------|
+| **Read Uncommitted**     | ✅ Possible     | ✅ Possible               | ✅ Possible       | Transactions can read uncommitted data from others. Least isolation, fastest but unsafe. |
+| **Read Committed**       | ❌ Prevented    | ✅ Possible               | ✅ Possible       | Each read sees only committed data, but repeated reads of the same row may differ. Default in many DBs (e.g., Oracle). |
+| **Repeatable Read**      | ❌ Prevented    | ❌ Prevented              | ✅ Possible (in some DBs like MySQL) | Ensures same row reads return consistent data, but new rows (phantoms) can appear. |
+| **Serializable**         | ❌ Prevented    | ❌ Prevented              | ❌ Prevented      | Highest isolation. Transactions are executed sequentially (as if serialized). Safest but slowest. |
+
+---
+
+### 🔍 Example Summary
+
+| **Phenomenon** | **Description** | **Example in Banking** |
+|----------------|------------------|------------------------|
+| **Dirty Read** | Reading uncommitted changes from another transaction. | TX-A reads a balance updated by TX-B before TX-B commits. If TX-B rolls back, TX-A read invalid data. |
+| **Non-Repeatable Read** | Same query returns different results within a transaction. | TX-A reads account balance = $500. TX-B updates it to $600 and commits. TX-A reads again and sees $600. |
+| **Phantom Read** | A range query returns different number of rows. | TX-A queries all transactions > $1000 → 10 rows. TX-B inserts a new $2000 transaction. TX-A re-runs query → 11 rows. |
+
+---
 
 
 # Isolation in Banking

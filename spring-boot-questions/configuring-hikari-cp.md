@@ -6,7 +6,7 @@ For high-throughput services, configure HikariCP for a **fixed-size pool** that 
 ### Key Configuration Settings
  **`minimumIdle` = `maximumPoolSize`**: Set these equal to create a **fixed-size pool**. This eliminates the latency of creating new connections during peak load.
 
- **`maximumPoolSize`**: Tune this based on your CPU cores and I/O limits (($\text{Cores} \times 2$) + some buffer(+1) $). Do not rely on the default of 10.
+ **`maximumPoolSize`**: Tune this based on your CPU cores and I/O limits **(($\text{Cores} \times 2$) + some buffer(+1) )**. Do not rely on the default of 10.
 
  **`connectionTimeout`**: Set this aggressively low (e.g., **500ms to 2000ms**) to enforce a **fail-fast** policy when the pool is saturated.
  
