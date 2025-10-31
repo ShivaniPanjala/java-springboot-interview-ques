@@ -4,10 +4,10 @@ For high-throughput services, configure HikariCP for a **fixed-size pool** that 
 ---
 
 ### Key Configuration Settings
-    1. **`minimumIdle` = `maximumPoolSize`**: Set these equal to create a **fixed-size pool**. This eliminates the latency of creating new connections during peak load.
-    2.  **`maximumPoolSize`**: Tune this based on your CPU cores and I/O limits (a common start is $\text{Cores} \times 2 + 1$). Do not rely on the default of 10.
-    3.  **`connectionTimeout`**: Set this aggressively low (e.g., **500ms to 2000ms**) to enforce a **fail-fast** policy when the pool is saturated.
-    4.  **`maxLifetime`**: Set this slightly **shorter than the database/firewall timeout** to proactively recycle and replace old connections, preventing silent errors.
+ **`minimumIdle` = `maximumPoolSize`**: Set these equal to create a **fixed-size pool**. This eliminates the latency of creating new connections during peak load.
+ **`maximumPoolSize`**: Tune this based on your CPU cores and I/O limits (a common start is $\text{Cores} \times 2 + 1$). Do not rely on the default of 10.
+ **`connectionTimeout`**: Set this aggressively low (e.g., **500ms to 2000ms**) to enforce a **fail-fast** policy when the pool is saturated.
+ **`maxLifetime`**: Set this slightly **shorter than the database/firewall timeout** to proactively recycle and replace old connections, preventing silent errors.
 
 
 
@@ -23,7 +23,6 @@ For high-throughput services, configure HikariCP for a **fixed-size pool** that 
 
 ---
 
-### ✅ Summary
 - Use a **fixed-size pool** for high-throughput, low-latency services.  
 - Set `maxLifetime` below the DB timeout to avoid stale connections.  
 - Keep `connectionTimeout` low to fail fast during overloads.  
