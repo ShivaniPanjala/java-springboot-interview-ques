@@ -2,8 +2,21 @@
 
 A `LazyInitializationException` occurs when you try to access a **lazy-loaded association** (like a `@OneToMany` or `@ManyToOne`) **after the Hibernate session has been closed** — meaning Hibernate can’t fetch the data it deferred.
 
+Think of a Hibernate lazy association as a **“promise”**:
+
+> “I’ll load this data later **if you ask**, as long as the session is still open.”
+
+If you ask **after** the session is closed → it can’t keep that promise → 💥 `LazyInitializationException`
+
 ---
 Example
+
+LazyInitializationException occurs because:
+- The `appointments` collection in Doctor is mapped as `@OneToMany(fetch = LAZY)`.
+- doctorRepository.findById(1L) loads the Doctor entity **within a short-lived session**.
+- After the repository method returns, the Hibernate session is **closed**.
+- Calling doctor.getAppointments().size() **needs to fetch the lazy collection** from the database.
+- Since the session is closed, Hibernate cannot load it → throws LazyInitializationException.
 
 ```java
 Doctor doctor = doctorRepository.findById(1L).orElseThrow();
