@@ -10,7 +10,10 @@ If you ask **after** the session is closed → it can’t keep that promise → 
 
 ---
 Example
-
+```java
+Doctor doctor = doctorRepository.findById(1L).orElseThrow();
+System.out.println(doctor.getAppointments().size()); // ❌ LazyInitializationException
+```
 LazyInitializationException occurs because:
 - The `appointments` collection in Doctor is mapped as `@OneToMany(fetch = LAZY)`.
 - doctorRepository.findById(1L) loads the Doctor entity **within a short-lived session**.
@@ -18,10 +21,6 @@ LazyInitializationException occurs because:
 - Calling doctor.getAppointments().size() **needs to fetch the lazy collection** from the database.
 - Since the session is closed, Hibernate cannot load it → throws LazyInitializationException.
 
-```java
-Doctor doctor = doctorRepository.findById(1L).orElseThrow();
-System.out.println(doctor.getAppointments().size()); // ❌ LazyInitializationException
-```
 
 `@OneToMany` defaults to `FetchType.LAZY`.
 When the session is closed (e.g., outside a `@Transactional` boundary), the collection can’t be loaded anymore.
