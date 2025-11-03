@@ -91,8 +91,8 @@ Always use a consistent response structure, avoid exposing internal details, and
 ---
 
 # Difference between Lazy and Eager loading
-Lazy Loading:  Data is loaded **only when it’s accessed** for the first time.  
-Eager Loading: Data is loaded **immediately along with the parent entity.**
+  - Lazy Loading:  Data is loaded **only when it’s accessed** for the first time.  
+  - Eager Loading: Data is loaded **immediately along with the parent entity.**
 ---
 
 # What are N+1 query problems? How to solve them?
