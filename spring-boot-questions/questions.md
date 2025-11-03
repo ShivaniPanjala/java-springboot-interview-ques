@@ -12,8 +12,7 @@ Dependency Injection is a design pattern in which an object **receives its depen
 - **Dependency Resolution:** Identifies required dependencies for each bean.  
 - **Injection:** Injects dependencies via constructor, setter, or field.  
 - **Lifecycle Management:** Manages bean lifecycle, including `@PostConstruct` and `@PreDestroy`.
-
-**Note:** Constructor injection provides dependencies when the object is created (mandatory), while setter injection provides them after creation (optional or changeable).
+Note:  Constructor injection provides dependencies when the object is created (mandatory), while setter injection provides them after creation (optional or changeable).
 ---
 
 # Difference between @Component, @Service, and @Repository
@@ -87,13 +86,13 @@ Hibernate entities go through **four main states** during their lifecycle:
 ---
 
 # Exception handling best practices in REST APIs
-In Spring REST APIs, handle exceptions centrally using `@ControllerAdvice` and `@ExceptionHandler` to return meaningful HTTP status codes and messages.  
+- In Spring REST APIs, handle exceptions centrally using `@ControllerAdvice` and `@ExceptionHandler` to return meaningful HTTP status codes and messages.  
 Always use a consistent response structure, avoid exposing internal details, and log errors for debugging.
 ---
 
 # Difference between Lazy and Eager loading
-**Lazy Loading:** Data is loaded **only when it’s accessed** for the first time.  
-**Eager Loading:** Data is loaded **immediately along with the parent entity.**
+Lazy Loading:  Data is loaded **only when it’s accessed** for the first time.  
+Eager Loading: Data is loaded **immediately along with the parent entity.**
 ---
 
 # What are N+1 query problems? How to solve them?
@@ -104,7 +103,7 @@ Occurs when Hibernate executes **1 query to fetch parent entities** and then **N
 1 query for all doctors → N queries for each doctor’s appointments.
 
 **Solution:**  
-Use **`JOIN FETCH`** (JPQL) or **`@EntityGraph`** to fetch related entities in a single query, or adjust the **fetch strategy** wisely.
+ - Use **`JOIN FETCH`** (JPQL) or **`@EntityGraph`** to fetch related entities in a single query, or adjust the **fetch strategy** wisely.
 ---
 
 # How to avoid code duplication when multiple entities share common fields?
