@@ -142,4 +142,82 @@ public class Doctor extends BaseEntity {
 - More flexible but requires more maintenance and version management.
 ---
 
-# 
+# How do you implement idempotency in REST APIs?
+**Definition:**  
+Idempotency ensures that making the same request multiple times results in the **same outcome** — preventing duplicate operations.
+
+## How It’s Implemented
+- The client sends a unique header, e.g., **`Idempotency-Key`**, with each request.
+- The server stores this key and the result of the first request.
+- If the same key is received again, the server **returns the same response** instead of executing the operation again.
+
+## Example
+**Request:**
+```http
+POST /api/payments
+Idempotency-Key: daznId-12345
+Content-Type: application/json
+
+{
+  "amount": 100,
+  "currency": "USD",
+  "userId": "U1001"
+}
+```
+---
+
+# How do you handle huge traffic in Spring Boot APIs? (connection pool, caching, async calls)
+1. **Connection Pooling (HikariCP):**  
+   Use a properly tuned connection pool (e.g., `maximumPoolSize`, `connectionTimeout`) to efficiently reuse database connections instead of opening new ones for every request.
+2. **Caching:**  
+   Use caching (e.g., `@Cacheable`, Redis, or Caffeine) to store frequently accessed data in memory, reducing database load and improving response time.
+3. **Asynchronous Calls:**  
+   Use `@Async` or message queues (like RabbitMQ/Kafka) to process heavy or background tasks asynchronously, freeing up threads for incoming requests.
+
+**Summary:**  
+Optimize database access (via pooling), reduce repetitive work (via caching), and offload slow operations (via async processing) to efficiently handle **high traffic** and maintain **fast, scalable APIs**.
+---
+
+# How would you optimize large batch inserts/updates in Hibernate?
+  1. Enable JDBC batching **hibernate.jdbc.batch_size = 50**
+  2. Manage session memory to avoid memory issues
+      - session.flush() (to execute the batch)
+      - session.clear() (to free the cache)
+  3. Do not use **GenerationType.IDENTITY** for IDs, as it disables batching. Use GenerationType.SEQUENCE instead.
+
+  ```
+  Transaction tx = session.beginTransaction();
+  int batchSize = 50;
+  for (int i = 0; i < items.size(); i++) {
+  session.save(items.get(i));
+  
+      if (i % batchSize == 0) {
+          session.flush();
+          session.clear(); // Detach objects to free memory
+      }
+  }
+  
+  tx.commit();
+  session.close();
+  ```
+
+---
+
+# Explain difference between entity graphs and fetch joins for optimizing queries
+1. Fetch Join
+    - Defined directly in JPQL/HQL using JOIN FETCH.
+    - Eagerly loads related entities in the same query.
+    - Simple and explicit, but hardcoded in the query.
+    - Best for one-off queries where you know exactly which associations to fetch.
+    Example:
+    ```
+      @Query("SELECT d FROM Department d JOIN FETCH d.employees WHERE d.id = :id")
+      Department findDepartmentWithEmployees(@Param("id") Long id)
+    ```
+2. Entity Graph
+    - Defined via annotations or dynamically at runtime.
+    - Specifies which associations to fetch without modifying the JPQL query.
+    - Reusable across multiple queries; more flexible for APIs or dynamic fetch plans.
+    
+
+---
