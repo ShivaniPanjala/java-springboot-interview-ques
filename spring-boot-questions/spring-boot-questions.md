@@ -158,7 +158,9 @@ Content-Type: application/json
    Use `@Async` or message queues (like RabbitMQ/Kafka) to process heavy or background tasks asynchronously, freeing up threads for incoming requests.
 
 **Summary:**  
-Optimize database access (via pooling), reduce repetitive work (via caching), and offload slow operations (via async processing) to efficiently handle **high traffic** and maintain **fast, scalable APIs**.
+- Optimize database access (via pooling), 
+- reduce repetitive work (via caching), 
+- and offload slow operations (via async processing) to efficiently handle **high traffic** and maintain **fast, scalable APIs**.
 ---
 
 # Explain Spring Boot Starter dependencies and how they simplify configuration.
@@ -167,6 +169,7 @@ Starters are like ready-made packages of libraries for a specific feature
   1. **Automatic setup**: Spring Boot configures most things for you.
   2. **Compatible versions**: You don’t need to worry about version conflicts.
   3. **Less manual work**: No XML or complicated setup—just start coding.
+
 **Examples:**
   - spring-boot-starter-web
   - spring-boot-starter-data-jpa
