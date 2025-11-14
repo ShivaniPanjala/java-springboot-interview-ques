@@ -104,17 +104,17 @@
 ---
 
 # Difference between save(), saveOrUpdate(), and persist() in Hibernate.
-## save()  — *Hibernate-specific*
+**save()**  — Hibernate-specific
 - Saves a new object to the database.
 - Returns the generated ID.
 - Object moves from transient → persistent immediately.
 
-## persist() — *JPA Standard*
+**persist()** — JPA Standard
 - Saves a new object but does not return ID.
 - Must be called inside a transaction.
 - Object moves from transient → persistent, insert may happen at flush/commit.
 
-## saveOrUpdate() — *Hibernate-specific*
+**saveOrUpdate()** — Hibernate-specific
 - Saves a new object or updates an existing one.
 - Useful when you are not sure if the object is new or detached.
 - Object moves to persistent state, and Hibernate decides INSERT or UPDATE
@@ -151,14 +151,14 @@ Ways to avoid:
 ---
 
 # Explain optimistic vs pessimistic locking in JPA.
-## Optimistic Locking (no locks, check version at commit → faster, scalable.)
+**Optimistic Locking (no locks, check version at commit → faster, scalable.)**
 - Assumes **conflicts are rare**.
 - Does **not lock** the database row during read.
 - Uses a **@Version** field to detect conflicts.
 - If someone else updates the record first → **OptimisticLockException**.
 - Good for **high-concurrency systems** with mostly reads.
 
-## Pessimistic Locking(lock row upfront → safer but slower.*)
+**Pessimistic Locking(lock row upfront → safer but slower.*)**
 - Assumes **conflicts are common**.
 - Locks the row **immediately** when reading it (e.g., `SELECT … FOR UPDATE`).
 - Other transactions must **wait** until the lock is released.
@@ -183,13 +183,13 @@ Problem Occurs when Hibernate executes **1 query to fetch parent entities** and 
 
 # How does Hibernate manage transactions?
 
-## Using Spring Boot `@Transactional`
+**Using Spring Boot `@Transactional`**
 - `@Transactional` opens a transaction at the **start of the method**.
 - If no exceptions occur → transaction is **committed automatically**.
 - If an exception occurs → transaction is **rolled back automatically**.
 
 
-## Flow Without Spring
+**Flow Without Spring**
 1. Open a session -> Session session = sessionFactory.openSession()
 2. Begin transaction -> session.beginTransaction();
 3. Perform Operations -> save, update, delete Operations are queued in Hibernate’s first-level cache (session)
