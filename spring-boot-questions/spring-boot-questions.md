@@ -1,12 +1,12 @@
 # What is Dependency Injection? How does Spring handle it internally?
 Dependency Injection is a design pattern in which an object **receives its dependencies from an external source** rather than creating them itself.
 
-## Types of Dependency Injection
+**Types of Dependency Injection**
 1. **Constructor Injection** – Dependencies are provided through the class constructor.  
 2. **Setter Injection** – Dependencies are provided through setter methods after object creation.  
 3. **Field Injection** – Dependencies are injected directly into fields.
 
-## How Spring Handles DI
+**How Spring Handles DI**
 - **Component Scanning:** Detects classes annotated with `@Component`, `@Service`, etc.  
 - **Bean Registration:** Registers beans in the `ApplicationContext`.  
 - **Dependency Resolution:** Identifies required dependencies for each bean.  
@@ -130,12 +130,11 @@ public class Doctor extends BaseEntity {
 **Definition:**  
 Idempotency ensures that making the same request multiple times results in the **same outcome** — preventing duplicate operations.
 
-## How It’s Implemented
+**How It’s Implemented**
 - The client sends a unique header, e.g., **`Idempotency-Key`**, with each request.
 - The server stores this key and the result of the first request.
 - If the same key is received again, the server **returns the same response** instead of executing the operation again.
-
-## Example
+**Example**
 **Request:**
 ```http
 POST /api/payments
@@ -164,32 +163,32 @@ Optimize database access (via pooling), reduce repetitive work (via caching), an
 
 # Explain Spring Boot Starter dependencies and how they simplify configuration.
 Starters are like ready-made packages of libraries for a specific feature
-## How They Simplify Things
+**How They Simplify Things**
   1. **Automatic setup**: Spring Boot configures most things for you.
   2. **Compatible versions**: You don’t need to worry about version conflicts.
   3. **Less manual work**: No XML or complicated setup—just start coding.
-## Examples:
+**Examples:**
   - spring-boot-starter-web
   - spring-boot-starter-data-jpa
   - spring-boot-starter-security
 ---
 
 # Difference between @Autowired and @Qualifier.
-@Autowired-  finds beans **by type**
-@Qualifier- **resolves ambiguity** when multiple beans of the same type exist
+- @Autowired-  finds beans **by type**
+- @Qualifier- **resolves ambiguity** when multiple beans of the same type exist
 ---
 
 # How do you handle global exception handling in Spring Boot REST APIs?
-handle exceptions globally using `@ControllerAdvice` and `@ExceptionHandler`.
-**@ControllerAdvice** allows centralized exception handling across all controllers.
-**@ExceptionHandler** maps specific exceptions to custom responses.
-You can create custom response objects instead of returning plain strings.
+- handle exceptions globally using `@ControllerAdvice` and `@ExceptionHandler`.
+- **@ControllerAdvice** allows centralized exception handling across all controllers.
+- **@ExceptionHandler** maps specific exceptions to custom responses.
+- You can create custom response objects instead of returning plain strings.
 ---
 
 # How do you implement Spring Boot profiles for different environments?
-Activate the profile using **spring.profiles.active=dev**
-Use **@Profile** to load beans only for certain environments
-@Profile("dev") - Spring will only load the beans that match the active profile.
+- Activate the profile using **spring.profiles.active=dev**
+- Use **@Profile** to load beans only for certain environments
+- @Profile("dev") - Spring will only load the beans that match the active profile.
 ---
 
 # How do you secure Spring Boot REST APIs using JWT/OAuth2?
