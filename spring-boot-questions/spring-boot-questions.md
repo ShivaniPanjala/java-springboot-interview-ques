@@ -177,3 +177,38 @@ Content-Type: application/json
 **Summary:**  
 Optimize database access (via pooling), reduce repetitive work (via caching), and offload slow operations (via async processing) to efficiently handle **high traffic** and maintain **fast, scalable APIs**.
 ---
+
+# Explain Spring Boot Starter dependencies and how they simplify configuration.
+Starters are like ready-made packages of libraries for a specific feature
+## How They Simplify Things
+  1. **Automatic setup**: Spring Boot configures most things for you.
+  2. **Compatible versions**: You don’t need to worry about version conflicts.
+  3. **Less manual work**: No XML or complicated setup—just start coding.
+## Examples:
+  - spring-boot-starter-web
+  - spring-boot-starter-data-jpa
+  - spring-boot-starter-security
+---
+
+# Difference between @Autowired and @Qualifier.
+@Autowired-  finds beans **by type**
+@Qualifier- **resolves ambiguity** when multiple beans of the same type exist
+---
+
+# How do you handle global exception handling in Spring Boot REST APIs?
+handle exceptions globally using `@ControllerAdvice` and `@ExceptionHandler`.
+**@ControllerAdvice** allows centralized exception handling across all controllers.
+**@ExceptionHandler** maps specific exceptions to custom responses.
+You can create custom response objects instead of returning plain strings.
+---
+
+# How do you implement Spring Boot profiles for different environments?
+Activate the profile using **spring.profiles.active=dev**
+Use **@Profile** to load beans only for certain environments
+@Profile("dev") - Spring will only load the beans that match the active profile.
+---
+
+# How do you secure Spring Boot REST APIs using JWT/OAuth2?
+
+
+---
