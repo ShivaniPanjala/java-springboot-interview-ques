@@ -90,22 +90,6 @@ Hibernate entities go through **four main states** during their lifecycle:
 Always use a consistent response structure, avoid exposing internal details, and log errors for debugging.
 ---
 
-# Difference between Lazy and Eager loading
-  - Lazy Loading:  Data is loaded **only when it’s accessed** for the first time.  
-  - Eager Loading: Data is loaded **immediately along with the parent entity.**
----
-
-# What are N+1 query problems? How to solve them?
-**N+1 Query Problem:**  
-Occurs when Hibernate executes **1 query to fetch parent entities** and then **N additional queries** (one for each parent) to fetch their child entities lazily.
-
-**Example:**  
-1 query for all doctors → N queries for each doctor’s appointments.
-
-**Solution:**  
- - Use **`JOIN FETCH`** (JPQL) or **`@EntityGraph`** to fetch related entities in a single query, or adjust the **fetch strategy** wisely.
----
-
 # How to avoid code duplication when multiple entities share common fields?
 We can avoid code duplication by using a **Base Entity class** with common fields 
 and marking it with `@MappedSuperclass`.
