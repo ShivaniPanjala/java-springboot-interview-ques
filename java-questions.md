@@ -30,10 +30,10 @@
 
 **How It Works Internally (The Map)**
 - Internally, ThreadLocal stores values using a hash map specific to each thread called the **ThreadLocalMap**
-    **Thread T1's ThreadLocalMap:**
+    - **Thread T1's ThreadLocalMap:**
        - Key: ThreadLocal object A → Value: A1 (thread-specific)
        - Key: ThreadLocal object B → Value: B1
-    **Thread T2's ThreadLocalMap:**
+    - **Thread T2's ThreadLocalMap:**
        - Key: ThreadLocal object A → Value: A2 (thread-specific)
        - Key: ThreadLocal object B → Value: B2
     - Each thread maintains its own map with keys as ThreadLocal objects and values as thread-specific data.
