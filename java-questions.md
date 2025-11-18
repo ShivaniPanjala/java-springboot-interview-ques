@@ -40,11 +40,11 @@
 - **Weak References:** The keys in this map are weak references to the ThreadLocal objects, and the values are the actual data objects you store (e.g., your User object).
 
 - When you call:
-    **threadLocal.set(value):** Java uses the current Thread as a key to find its internal ThreadLocalMap. The map then stores the association: (Key: weak reference to threadLocal instance, Value: value object).
+    - **threadLocal.set(value):** Java uses the current Thread as a key to find its internal ThreadLocalMap. The map then stores the association: (Key: weak reference to threadLocal instance, Value: value object).
 
-    **threadLocal.get():** The current Thread is used to look up its internal map. The map uses the threadLocal instance to retrieve the associated value object.
+    - **threadLocal.get():** The current Thread is used to look up its internal map. The map uses the threadLocal instance to retrieve the associated value object.
 
-    **Crucial Point:** The ThreadLocalMap is owned by the Thread, not the ThreadLocal variable
+    - **Crucial Point:** The ThreadLocalMap is owned by the Thread, not the ThreadLocal variable
 
 
 - **Example:** 
