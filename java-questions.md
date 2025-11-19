@@ -88,3 +88,54 @@ public class ThreadLocalDemo {
 
 ---
 
+# How does ForkJoinPool differ from a regular ThreadPoolExecutor?
+- **ForkJoinPool**
+    - tasks that can be recursively split into smaller **subtasks (forked)** and then **combined (joined)** to form a final result.
+    - Each thread in a ForkJoinPool has its own **double-ended queue (deque)** to store subtasks it creates
+    - It uses a **work-stealing** algorithm where idle threads can steal tasks from busier threads’ queues to balance the workload and improve performance.
+    - To use ForkJoinPool effectively, tasks should **avoid synchronization**, shared variables, or blocking operations to keep execution pure and isolated.
+    - divide-and-conquer problems, recursive, fine-grained tasks (like parallel algorithms)
+
+    ```
+    public Result solve(Task t) {
+        split t into smaller tasks
+
+        for each of these tasks:
+        solve(ti)
+
+        wait for all tasks to complete
+
+        join all individual results
+
+        return result
+    }
+    ```
+- **ThreadPoolExecutor**
+    - It manages a pool of worker threads and a task queue to execute Runnable or Callable tasks efficiently.
+    - helps to create a customizable threadpool
+
+    ```
+    public ThreadPoolExecutor(
+        int corePoolSize, - Minimum number of threads to keep alive
+        int maximumPoolSize, - Max number of threads allowed (used when the queue is full).
+        long keepAliveTime, - Idle threads beyond corePoolSize are terminated after this time (allowCoreThreadTimeOut: true)
+        TimeUnit unit, - time unit for keep alive time
+        BlockingQueue<Runnable> workQueue, - Where tasks wait -> bounded Queue(ArrayBlockingQueue), unbounded Queue(LinkedBlockingQueue)
+        ThreadFactory threadFactory, - factory for creating new thread by giving custom name, thread priority, and set deamon flag
+        RejectedExecutionHandler handler - handler for tasks that can not be accepted by thread pool. Rejection Policies -> AbortPolicy, AbortPolicy, DiscardPolicy, DiscardOldestPolicy
+        )
+
+    ```
+    - It improves performance by **reusing threads** and helps control concurrency under load.
+    - general-purpose asynchronous task execution
+
+
+| Feature / Aspect        | ThreadPoolExecutor                                   | ForkJoinPool                                              |
+|-------------------------|--------------------------------------------------------|-----------------------------------------------------------|
+| **Purpose**             | General-purpose task execution                         | Parallelism and divide-and-conquer algorithms             |
+| **Task Types**          | `Runnable`, `Callable`                                 | `RecursiveTask`, `RecursiveAction`                        |
+| **Work Queue Model**    | Single shared blocking queue                           | Per-thread deque + work-stealing                          |
+| **Best For**            | Long-running, I/O-bound, independent tasks             | Many small CPU-bound subtasks that recursively split      |
+| **Thread Count**        | Fully configurable; can exceed CPU cores               | Usually equals number of CPU cores                        |
+| **Blocking Behavior**   | Blocking is fine                                       | Blocking discouraged; use `ManagedBlocker` if needed      |
+
