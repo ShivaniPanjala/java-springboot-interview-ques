@@ -25,7 +25,7 @@
 5. Terminated: Thread execution completes
 
 **Thread execution flow**
-```
+```Java
 Thread.start() → JVM schedules thread → Thread enters Runnable state → OS assigns CPU → Thread runs → completes → Thread terminates
 ```
 - Scheduling: OS decides which thread runs based on priority, time-slicing, and available cores
@@ -48,7 +48,7 @@ Thread.start() → JVM schedules thread → Thread enters Runnable state → OS 
         - Ensures max thread concurrency
         - Prevents too many threads from being created
 - In Java, you usually get it via factory methods in Executors class:
-    ```
+    ```Java
     ExecutorService pool = Executors.newFixedThreadPool(10);
     ```
 ---
@@ -58,20 +58,20 @@ Thread.start() → JVM schedules thread → Thread enters Runnable state → OS 
 - It manages a pool of worker threads and a task queue to execute Runnable or Callable tasks efficiently.
 - helps to create a customizable threadpool
 
-    ```
+    ```Java
     public ThreadPoolExecutor(
-        int corePoolSize, - Minimum number of threads to keep alive
-        int maximumPoolSize, - Max number of threads allowed (used when the queue is full).
-        long keepAliveTime, - Idle threads beyond corePoolSize are terminated after this time (allowCoreThreadTimeOut: true)
-        TimeUnit unit, - time unit for keep alive time
-        BlockingQueue<Runnable> workQueue, - Where tasks wait -> bounded Queue(ArrayBlockingQueue), unbounded Queue(LinkedBlockingQueue)
-        ThreadFactory threadFactory, - factory for creating new thread by giving custom name, thread priority, and set deamon flag
-        RejectedExecutionHandler handler - handler for tasks that can not be accepted by thread pool. Rejection Policies -> AbortPolicy, AbortPolicy, DiscardPolicy, DiscardOldestPolicy
+        int corePoolSize,  // Minimum number of threads to keep alive
+        int maximumPoolSize,// Max number of threads allowed (used when the queue is full).
+        long keepAliveTime, // Idle threads beyond corePoolSize are terminated after this time (allowCoreThreadTimeOut: true)
+        TimeUnit unit, // time unit for keep alive time
+        BlockingQueue<Runnable> workQueue, // Where tasks wait -> bounded Queue(ArrayBlockingQueue), unbounded Queue(LinkedBlockingQueue)
+        ThreadFactory threadFactory, // factory for creating new thread by giving custom name, thread priority, and set deamon flag
+        RejectedExecutionHandler handler // handler for tasks that can not be accepted by thread pool. Rejection Policies -> AbortPolicy, AbortPolicy, DiscardPolicy, DiscardOldestPolicy
         )
 
     ```
 - **Executors.newFixedThreadPool()** internally creates a ThreadPoolExecutor.
-```
+```Java
 ThreadPoolExecutor executor = new ThreadPoolExecutor(
     5, 10, 60, TimeUnit.SECONDS,
     new LinkedBlockingQueue<Runnable>()
@@ -104,5 +104,139 @@ ThreadPoolExecutor executor = new ThreadPoolExecutor(
     ```
 ---
 
+# **Deadlock**(threads wait on each other forever)
+- Thread 1 locks lock1 and waits for lock2
+- Thread 2 locks lock2 and waits for lock1
+- Both wait forever → deadlock
+    ``` java
+    public class DeadlockExample {
+
+        static final Object lock1 = new Object();
+        static final Object lock2 = new Object();
+
+        public static void main(String[] args) {
+
+            Thread t1 = new Thread(() -> {
+                synchronized (lock1) {
+                    System.out.println("Thread 1: Locked lock1");
+                    synchronized (lock2) {
+                        System.out.println("Thread 1: Locked lock2");
+                    }
+                }
+            });
+
+            Thread t2 = new Thread(() -> {
+                synchronized (lock2) {
+                    System.out.println("Thread 2: Locked lock2");
+                    synchronized (lock1) {
+                        System.out.println("Thread 2: Locked lock1");
+                    }
+                }
+            });
+
+            t1.start();
+            t2.start();
+        }
+    }
+
+    ```
+---
+
+# **LiveLock**(Thread is Active, repeatedly trying)
+- They keep actively trying to acquire resources or change state, but never make progress
+
+- EX:   
+    - Thread 1 locks lock1 but fails to get lock2, so it releases lock1 and retries
+    - Thread 2 locks lock2 but fails to get lock1, so it releases lock2 and retries
+    - Both threads keep releasing and retrying without making progress → livelock
+
+    ```java
+    Thread t1 = new Thread(() -> {
+        while (true) {
+            if (tryLock(lock1)) {
+                if (tryLock(lock2)) {
+                    System.out.println("Thread 1: Locked both locks");
+                    unlock(lock2);
+                    unlock(lock1);
+                    break;
+                } else {
+                    // release lock1 and retry
+                    unlock(lock1);
+                }
+            }
+        }
+    });
 
 
+    Thread t2 = new Thread(() -> {
+        while (true) {
+            if (tryLock(lock2)) {
+                if (tryLock(lock1)) {
+                    System.out.println("Thread 2: Locked both locks");
+                    unlock(lock1);
+                    unlock(lock2);
+                    break;
+                } else {
+                    // release lock2 and retry
+                    unlock(lock2);
+                }
+            }
+        }
+    });
+
+    ```
+---
+
+# **starvation**(a thread is ready but never gets CPU or locks)
+- Starvation happens when a thread is ready to run, but **never gets CPU time** or access to a resource because other threads keep taking priority.
+- The thread is not blocked (like deadlock) but is ignored indefinitely.
+- EX: 
+    ```java
+    import java.util.concurrent.locks.ReentrantLock;
+
+    public class StarvationExample {
+
+        private static final ReentrantLock lock = new ReentrantLock();
+
+        public static void main(String[] args) {
+
+            // High-priority thread keeps running
+            Thread highPriorityThread = new Thread(() -> {
+                while (true) {
+                    lock.lock();
+                    try {
+                        System.out.println("High priority thread running");
+                        // simulate work
+                        Thread.sleep(50);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    } finally {
+                        lock.unlock();
+                    }
+                }
+            });
+            highPriorityThread.setPriority(Thread.MAX_PRIORITY);
+
+            // Low-priority thread may starve
+            Thread lowPriorityThread = new Thread(() -> {
+                while (true) {
+                    lock.lock();
+                    try {
+                        System.out.println("Low priority thread running");
+                        Thread.sleep(50);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    } finally {
+                        lock.unlock();
+                    }
+                }
+            });
+            lowPriorityThread.setPriority(Thread.MIN_PRIORITY);
+
+            highPriorityThread.start();
+            lowPriorityThread.start();
+        }
+    }
+    ```
+
+---
