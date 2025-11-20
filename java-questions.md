@@ -26,60 +26,37 @@
 ---
 
 # Explain ThreadLocal – how it works internally, pitfalls.
-- ThreadLocal is a mechanism in Java that provides thread isolation by giving each thread its own, **private copy of a variable**. This allows you to store state that is local to a single thread, effectively making a variable **per-thread global**
+- A ThreadLocal gives **each thread its own private variable**, not shared with other threads.
+- EX: Think of ThreadLocal like a locker room:
+    - Each thread has its own locker
+    - Same variable name, but each thread gets its own copy
+    - Threads cannot see each other’s values
+    ```
+        ThreadLocal<String> threadLocal = new ThreadLocal<>();
+        threadLocal.set("value for this thread");
+        String value = threadLocal.get();
+    ```     
 
-**How It Works Internally (The Map)**
+**How It Works Internally (ThreadLocalMap)**
 - Internally, ThreadLocal stores values using a hash map specific to each thread called the **ThreadLocalMap**
-    - **Thread T1's ThreadLocalMap:**
-       - Key: ThreadLocal object A → Value: A1 (thread-specific)
-       - Key: ThreadLocal object B → Value: B1
-    - **Thread T2's ThreadLocalMap:**
-       - Key: ThreadLocal object A → Value: A2 (thread-specific)
-       - Key: ThreadLocal object B → Value: B2
-    - Each thread maintains its own map with keys as ThreadLocal objects and values as thread-specific data.
-- **Weak References:** The keys in this map are weak references to the ThreadLocal objects, and the values are the actual data objects you store (e.g., your User object).
+- ThreadLocal<T> provides per-thread storage.
+- Every Thread object in the JVM contains a field:
+    ```
+        ThreadLocalMap threadLocals
+    ```
+    - This is essentially a Map<ThreadLocal, value> that exists inside the Thread object.
+- When you call: 
+    - **threadLocal.set(value)**
+        - Internally:
+            - JVM gets the current thread
+            - Looks at its ThreadLocalMap
+            - Stores the value in the map using the ThreadLocal instance as the key
 
-- When you call:
-    - **threadLocal.set(value):** Java uses the current Thread as a key to find its internal ThreadLocalMap. The map then stores the association: (Key: weak reference to threadLocal instance, Value: value object).
-
-    - **threadLocal.get():** The current Thread is used to look up its internal map. The map uses the threadLocal instance to retrieve the associated value object.
-
-    - **Crucial Point:** The ThreadLocalMap is owned by the Thread, not the ThreadLocal variable
-
-
-- **Example:** 
-```
-public class ThreadLocalDemo {
-    private static final ThreadLocal<String> session = ThreadLocal.withInitial(() -> null);
-
-    public static void main(String[] args) throws InterruptedException {
-        Thread t1 = new Thread(() -> {
-            session.set("T1 user 1");
-            try {
-                Thread.sleep(2000); // Simulating some delay
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-            System.out.println(Thread.currentThread().getName() + " session user: " + session.get());
-            session.remove();
-        }, "Thread T1");
-
-        Thread t2 = new Thread(() -> {
-            session.set("T2 user 2");
-            System.out.println(Thread.currentThread().getName() + " session user: " + session.get());
-            session.remove();
-        }, "Thread T2");
-
-        t1.start();
-        t2.start();
-
-        t1.join();
-        t2.join();
-
-        System.out.println("Main thread exiting");
-    }
-}
-```
+        - So each thread gets its own separate value, even though you use the same ThreadLocal object.
+        - When the thread ends:
+            - ThreadLocalMap is destroyed with the thread → memory is released.
+- ThreadLocal does NOT create a new thread; it gives each thread its own private copy of a variable.
+- **Crucial Point:** The ThreadLocalMap is owned by the Thread, not the ThreadLocal variable
 
 - **Pitfalls**
    - If you use thread pools (like in ExecutorService) and don’t remove values
@@ -89,46 +66,6 @@ public class ThreadLocalDemo {
 ---
 
 # How does ForkJoinPool differ from a regular ThreadPoolExecutor?
-- **ForkJoinPool**
-    - tasks that can be recursively split into smaller **subtasks (forked)** and then **combined (joined)** to form a final result.
-    - Each thread in a ForkJoinPool has its own **double-ended queue (deque)** to store subtasks it creates
-    - It uses a **work-stealing** algorithm where idle threads can steal tasks from busier threads’ queues to balance the workload and improve performance.
-    - To use ForkJoinPool effectively, tasks should **avoid synchronization**, shared variables, or blocking operations to keep execution pure and isolated.
-    - divide-and-conquer problems, recursive, fine-grained tasks (like parallel algorithms)
-
-    ```
-    public Result solve(Task t) {
-        split t into smaller tasks
-
-        for each of these tasks:
-        solve(ti)
-
-        wait for all tasks to complete
-
-        join all individual results
-
-        return result
-    }
-    ```
-- **ThreadPoolExecutor**
-    - It manages a pool of worker threads and a task queue to execute Runnable or Callable tasks efficiently.
-    - helps to create a customizable threadpool
-
-    ```
-    public ThreadPoolExecutor(
-        int corePoolSize, - Minimum number of threads to keep alive
-        int maximumPoolSize, - Max number of threads allowed (used when the queue is full).
-        long keepAliveTime, - Idle threads beyond corePoolSize are terminated after this time (allowCoreThreadTimeOut: true)
-        TimeUnit unit, - time unit for keep alive time
-        BlockingQueue<Runnable> workQueue, - Where tasks wait -> bounded Queue(ArrayBlockingQueue), unbounded Queue(LinkedBlockingQueue)
-        ThreadFactory threadFactory, - factory for creating new thread by giving custom name, thread priority, and set deamon flag
-        RejectedExecutionHandler handler - handler for tasks that can not be accepted by thread pool. Rejection Policies -> AbortPolicy, AbortPolicy, DiscardPolicy, DiscardOldestPolicy
-        )
-
-    ```
-    - It improves performance by **reusing threads** and helps control concurrency under load.
-    - general-purpose asynchronous task execution
-
 
 | Feature / Aspect        | ThreadPoolExecutor                                   | ForkJoinPool                                              |
 |-------------------------|--------------------------------------------------------|-----------------------------------------------------------|
@@ -139,3 +76,4 @@ public class ThreadLocalDemo {
 | **Thread Count**        | Fully configurable; can exceed CPU cores               | Usually equals number of CPU cores                        |
 | **Blocking Behavior**   | Blocking is fine                                       | Blocking discouraged; use `ManagedBlocker` if needed      |
 
+---
