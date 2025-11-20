@@ -83,12 +83,11 @@ ThreadPoolExecutor executor = new ThreadPoolExecutor(
 
 
 # ForkJoinPool
-    - tasks that can be recursively split into smaller **subtasks (forked)** and then **combined (joined)** to form a final result.
-    - Each thread in a ForkJoinPool has its own **double-ended queue (deque)** to store subtasks it creates
-    - It uses a **work-stealing** algorithm where idle threads can steal tasks from busier threads’ queues to balance the workload and improve performance.
-    - To use ForkJoinPool effectively, tasks should **avoid synchronization**, shared variables, or blocking operations to keep execution pure and isolated.
-    - divide-and-conquer problems, recursive, fine-grained tasks (like parallel algorithms)
-
+- tasks that can be recursively split into smaller **subtasks (forked)** and then **combined (joined)** to form a final result.
+- Each thread in a ForkJoinPool has its own **double-ended queue (deque)** to store subtasks it creates
+- It uses a **work-stealing** algorithm where idle threads can steal tasks from busier threads’ queues to balance the workload and improve performance.
+- To use ForkJoinPool effectively, tasks should **avoid synchronization**, shared variables, or blocking operations to keep execution pure and isolated.
+- divide-and-conquer problems, recursive, fine-grained tasks (like parallel algorithms)
     ```
     public Result solve(Task t) {
         split t into smaller tasks

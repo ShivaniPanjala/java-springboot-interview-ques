@@ -77,3 +77,146 @@
 | **Blocking Behavior**   | Blocking is fine                                       | Blocking discouraged; use `ManagedBlocker` if needed      |
 
 ---
+
+# Explain Deadlock, Livelock, Starvation → how to prevent them in Java.
+
+- **Deadlock**(threads wait on each other forever)
+    - Thread 1 locks lock1 and waits for lock2
+    - Thread 2 locks lock2 and waits for lock1
+    - Both wait forever → deadlock
+``` java
+public class DeadlockExample {
+
+    static final Object lock1 = new Object();
+    static final Object lock2 = new Object();
+
+    public static void main(String[] args) {
+
+        Thread t1 = new Thread(() -> {
+            synchronized (lock1) {
+                System.out.println("Thread 1: Locked lock1");
+                synchronized (lock2) {
+                    System.out.println("Thread 1: Locked lock2");
+                }
+            }
+        });
+
+        Thread t2 = new Thread(() -> {
+            synchronized (lock2) {
+                System.out.println("Thread 2: Locked lock2");
+                synchronized (lock1) {
+                    System.out.println("Thread 2: Locked lock1");
+                }
+            }
+        });
+
+        t1.start();
+        t2.start();
+    }
+}
+
+```
+
+
+- **LiveLock**(Thread is Active, repeatedly trying)
+    - They keep actively trying to acquire resources or change state, but never make progress
+    
+    - Thread 1 locks lock1 but fails to get lock2, so it releases lock1 and retries
+    - Thread 2 locks lock2 but fails to get lock1, so it releases lock2 and retries
+    - Both threads keep releasing and retrying without making progress → livelock
+
+    - Ex: 
+    ```java
+    Thread t1 = new Thread(() -> {
+        while (true) {
+            if (tryLock(lock1)) {
+                if (tryLock(lock2)) {
+                    System.out.println("Thread 1: Locked both locks");
+                    unlock(lock2);
+                    unlock(lock1);
+                    break;
+                } else {
+                    // release lock1 and retry
+                    unlock(lock1);
+                }
+            }
+        }
+    });
+
+
+    Thread t2 = new Thread(() -> {
+        while (true) {
+            if (tryLock(lock2)) {
+                if (tryLock(lock1)) {
+                    System.out.println("Thread 2: Locked both locks");
+                    unlock(lock1);
+                    unlock(lock2);
+                    break;
+                } else {
+                    // release lock2 and retry
+                    unlock(lock2);
+                }
+            }
+        }
+    });
+
+    ```
+    
+- **starvation**(a thread is ready but never gets CPU or locks)
+    - Starvation happens when a thread is ready to run, but **never gets CPU time** or access to a resource because other threads keep taking priority.
+    - The thread is not blocked (like deadlock) but is ignored indefinitely.
+
+```java
+import java.util.concurrent.locks.ReentrantLock;
+
+public class StarvationExample {
+
+    private static final ReentrantLock lock = new ReentrantLock();
+
+    public static void main(String[] args) {
+
+        // High-priority thread keeps running
+        Thread highPriorityThread = new Thread(() -> {
+            while (true) {
+                lock.lock();
+                try {
+                    System.out.println("High priority thread running");
+                    // simulate work
+                    Thread.sleep(50);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                } finally {
+                    lock.unlock();
+                }
+            }
+        });
+        highPriorityThread.setPriority(Thread.MAX_PRIORITY);
+
+        // Low-priority thread may starve
+        Thread lowPriorityThread = new Thread(() -> {
+            while (true) {
+                lock.lock();
+                try {
+                    System.out.println("Low priority thread running");
+                    Thread.sleep(50);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                } finally {
+                    lock.unlock();
+                }
+            }
+        });
+        lowPriorityThread.setPriority(Thread.MIN_PRIORITY);
+
+        highPriorityThread.start();
+        lowPriorityThread.start();
+    }
+}
+```
+
+
+| Issue       | Thread State                | Cause                                     | CPU Usage           | Prevention                                             |
+|------------|----------------------------|------------------------------------------|-------------------|------------------------------------------------------|
+| Deadlock   | Blocked forever            | Circular wait on locks                    | Low               | Lock ordering, tryLock with timeout, minimize nested locks |
+| Livelock   | Active but no progress     | Repeated state changes without progress  | High              | Random back-off, avoid infinite retries, proper coordination |
+| Starvation | Ready but never executes   | Low priority or unfair scheduling        | Varies (other threads run) | Fair locks, balanced thread priorities, proper scheduling |
