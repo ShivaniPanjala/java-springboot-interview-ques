@@ -87,17 +87,21 @@
 | Starvation | Ready but never executes   | Low priority or unfair scheduling        | Varies (other threads run) | Fair locks, balanced thread priorities, proper scheduling |
 
 # Explain how CompletableFuture improves async programming.
-- Future
-    - runs on a separate thread, but when we call .get method it waits, so it is a blocking call
-- CompletableFuture
-    - same runs on a separate thread, but it won't wait for result, we give callback which will execute after we get the result
+- **Future**
+  - Runs on a separate thread, but when we call `.get()` it **waits**, so it is a **blocking call**.
+- **CompletableFuture**
+  - Also runs on a separate thread, but it **does not block**.  
+    Instead, we provide a **callback** that executes when the result is ready.
 
+---
 
 ## Blocking `Future` vs Non-Blocking `CompletableFuture`
 
 | Blocking Future | Non-Blocking CompletableFuture |
 |-----------------|--------------------------------|
-| ```
+
+```
+
 Main Thread
    |
    |---- starts async task ----> [ Worker Thread ]
@@ -106,7 +110,10 @@ Main Thread
    |                                |
    |        future.get()            |
    |<------- result returns --------|
-``` | ```
+``` 
+---
+
+```
 Main Thread
    |
    |---- starts async task ----> [ Worker Thread ]
@@ -114,7 +121,9 @@ Main Thread
    |---- continues doing other work ---------->
    |
    |---- callback triggered when done --------> (thenApply / thenAccept)
-``` 
+```
+
+---
 
 ## What it improves
 - Enables **non-blocking** asynchronous execution.
@@ -136,3 +145,4 @@ CompletableFuture.supplyAsync(() -> fetchData())
         System.out.println("Error: " + ex.getMessage());
         return null;
     });
+```
