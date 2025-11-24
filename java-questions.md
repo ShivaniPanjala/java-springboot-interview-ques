@@ -89,17 +89,6 @@
 # Explain how CompletableFuture improves async programming.
 - **Future**
   - Runs on a separate thread, but when we call `.get()` it **waits**, so it is a **blocking call**.
-- **CompletableFuture**
-  - Also runs on a separate thread, but it **does not block**.  
-    Instead, we provide a **callback** that executes when the result is ready.
-
----
-
-## Blocking `Future` vs Non-Blocking `CompletableFuture`
-
-| Blocking Future | Non-Blocking CompletableFuture |
-|-----------------|--------------------------------|
-
 ```
 
 Main Thread
@@ -112,7 +101,9 @@ Main Thread
    |<------- result returns --------|
 ``` 
 ---
-
+- **CompletableFuture**
+  - Also runs on a separate thread, but it **does not block**.  
+    Instead, we provide a **callback** that executes when the result is ready.
 ```
 Main Thread
    |
