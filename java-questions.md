@@ -95,10 +95,10 @@ Main Thread
    |
    |---- starts async task ----> [ Worker Thread ]
    |
-   |-------- waits (BLOCKS) --------|
-   |                                |
-   |        future.get()            |
-   |<------- result returns --------|
+   -------- waits (BLOCKS) --------|
+blocked                                |
+           future.get()            |
+runnable|<------- result returns --------|
 ``` 
 ---
 - **CompletableFuture**
@@ -113,9 +113,7 @@ Main Thread
    |
    |---- callback triggered when done --------> (thenApply / thenAccept)
 ```
-
 ---
-
 ## What it improves
 - Enables **non-blocking** asynchronous execution.
 - Supports **chaining** async operations (`thenApply`, `thenCompose`, `thenApplyAsync`).
@@ -123,11 +121,8 @@ Main Thread
 - Provides **built-in error handling** (`exceptionally`, `handle`).
 - Allows **callbacks** when tasks complete (`thenRun`, `thenAccept`).
 - Lets you use a **custom executor** for fine-grained thread control.
-
 ---
-
-## Basic Example
-
+## Example
 ```java
 CompletableFuture.supplyAsync(() -> fetchData())
     .thenApply(data -> transform(data))
@@ -137,3 +132,40 @@ CompletableFuture.supplyAsync(() -> fetchData())
         return null;
     });
 ```
+---
+
+# What is the difference between WeakReference, SoftReference, PhantomReference?
+- WeakReference → “I want it cached but it’s OK if it disappears.”
+- SoftReference → “Keep it as long as memory is healthy.”
+- PhantomReference → “Tell me exactly when it’s gone so I can clean up.”
+---
+
+#  Difference between HashMap, HashTable, and ConcurrentHashMap
+
+| Feature              | HashMap                                            | Hashtable                                  | ConcurrentHashMap                                               |
+|----------------------|-----------------------------------------------------|---------------------------------------------|------------------------------------------------------------------|
+| Thread Safety        | Not thread-safe.                                   | Thread-safe (Legacy).                       | Thread-safe (Optimized).                                        |
+| Synchronization      | None.                                              | Synchronized (`Method-level lock`).           | Locking only on updated segments/bins (`Lock Striping`/CAS).       |
+| Performance          | High (fastest for single-threaded).                | Low (synchronization overhead for all ops). | High (minimizes contention).                                     |
+| Null Key/Value       | Allows one null key and multiple null values.      | Does not allow null keys or values.         | Does not allow null keys or values.                              |
+| Fail-Fast Iterator   | Yes.                                               | No (Fail-safe iteration not guaranteed).    | Yes (weakly consistent iterators).                               |
+| Legacy               | No (introduced in Java 1.2).                       | Yes (original Java utility).                | No (introduced in Java 5).                                       |
+
+
+```Java
+Hashtable<Integer,String> ht=new Hashtable<Integer,String>(); 
+ht.put(101," ajay"); 
+ht.put(101,"Vijay"); 
+ht.put(102,"Ravi"); 
+ht.put(103,"Rahul"); 
+for (Map.Entry<Integer, String> m : ht.entrySet()) { // ht.entrySet()→ returns a set of all entries in the Hashtable. Each entry contains key + value together.each element in that set is a Map.Entry object
+    System.out.println(m.getKey() + " " + m.getValue());
+}
+ o/p: 
+103 Rahul
+102 Ravi
+101 Vijay
+
+```
+---
+
