@@ -85,3 +85,54 @@
 | Deadlock   | Blocked forever            | Circular wait on locks                    | Low               | Lock ordering, tryLock with timeout, minimize nested locks |
 | Livelock   | Active but no progress     | Repeated state changes without progress  | High              | Random back-off, avoid infinite retries, proper coordination |
 | Starvation | Ready but never executes   | Low priority or unfair scheduling        | Varies (other threads run) | Fair locks, balanced thread priorities, proper scheduling |
+
+# Explain how CompletableFuture improves async programming.
+- Future
+    - runs on a separate thread, but when we call .get method it waits, so it is a blocking call
+- CompletableFuture
+    - same runs on a separate thread, but it won't wait for result, we give callback which will execute after we get the result
+
+
+## Blocking `Future` vs Non-Blocking `CompletableFuture`
+
+| Blocking Future | Non-Blocking CompletableFuture |
+|-----------------|--------------------------------|
+| ```
+Main Thread
+   |
+   |---- starts async task ----> [ Worker Thread ]
+   |
+   |-------- waits (BLOCKS) --------|
+   |                                |
+   |        future.get()            |
+   |<------- result returns --------|
+``` | ```
+Main Thread
+   |
+   |---- starts async task ----> [ Worker Thread ]
+   |
+   |---- continues doing other work ---------->
+   |
+   |---- callback triggered when done --------> (thenApply / thenAccept)
+``` 
+
+## What it improves
+- Enables **non-blocking** asynchronous execution.
+- Supports **chaining** async operations (`thenApply`, `thenCompose`, `thenApplyAsync`).
+- Allows **combining** multiple async tasks (`allOf`, `combineAsync`).
+- Provides **built-in error handling** (`exceptionally`, `handle`).
+- Allows **callbacks** when tasks complete (`thenRun`, `thenAccept`).
+- Lets you use a **custom executor** for fine-grained thread control.
+
+---
+
+## Basic Example
+
+```java
+CompletableFuture.supplyAsync(() -> fetchData())
+    .thenApply(data -> transform(data))
+    .thenAccept(result -> System.out.println("Result: " + result))
+    .exceptionally(ex -> {
+        System.out.println("Error: " + ex.getMessage());
+        return null;
+    });
