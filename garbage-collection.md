@@ -4,7 +4,7 @@
 2. Heap
 - Both stack and heap are created by `JVM` and `stored in RAM`
 
-1. Stack Memory:
+1. **Stack Memory:**
 ------------------
 - Stores temporary variables and seperate memory block for methods
 - Primitive types (int, double, boolean, char, etc.) declared inside methods are stored directly in the stack frame
@@ -18,7 +18,7 @@
 - Variables within a `SCOPE` is only visible and as soon as any variable goes out of the scope, it get deleted from the stack(in `LIFO` order)
 - when stack memory goes full, it throws `java.lang.StackOverflowError`
 
-2. Heap Memory:
+2. **Heap Memory:**
 ---------------- 
 - Store Objects
 - There is no order of allocating the memory
@@ -58,46 +58,45 @@ Most JVMs divide the heap into generations:
 
 # GC Algorithms
 **Mark and Sweep Algorithm**(100MB)
-    - Mark Phase - the object is `reachable`(there is a reference path from stack/static/active threads. to the object) → it is `marked alive`
-    - Sweep Phase - object is `unreachable`(no references → eligible for GC) → it stays `unmarked`-> All unmarked (unreachable) objects are cleaned up from the heap.
+   - Mark Phase - the object is `reachable`(there is a reference path from stack/static/active threads. to the object) → it is `marked alive`
+   - Sweep Phase - object is `unreachable`(no references → eligible for GC) → it stays `unmarked`-> All unmarked (unreachable) objects are cleaned up from the heap.
 
-**Mark and Compact**(2GB) - Mark all reachable objects, then shift them together to remove gaps and eliminate fragmentation.
+**Mark and Compact**(2GB) 
+   - Mark all reachable objects, then shift them together to remove gaps and eliminate fragmentation.
 
 **G1 GC (Garbage First)** (>2GB)
-    - Splits heap into regions, each region can be anything (eden, s1, old etc...)
-    - collects priority regions first.
-    - -XX:MaxGCPauseMillis=200(ms) -> Sets a target value for desired maximum pause time
+   - Splits heap into regions, each region can be anything (eden, s1, old etc...)
+   - collects priority regions first.
+   - -XX:MaxGCPauseMillis=200(ms) -> Sets a target value for desired maximum pause time
 ---
 
-**Common problems and solutions**
-- Long or growing pauses : increase heap, raise MaxGCPauseMillis
-- Frequent Full GCs : increase heap size
+- **Common problems and solutions**
+    - Long or growing pauses : increase heap, raise MaxGCPauseMillis
+    - Frequent Full GCs : increase heap size
 
-
-
--**Garbage collectors in java**
-1. `G1 Garbage Collector (G1GC)` - Default from java 9+,  Efficient for multi-threaded, low-pause apps, high throughput, low latency
-2. Serial GC (single-threaded, small apps)
-3. Parallel GC (max throughput)
-4. CMS (Concurrent Mark-Sweep) (deprecated)
-5. ZGC (low latency)
-6. Shenandoah GC (ultra low pause)
+- **Garbage collectors in java**
+    1. `G1 Garbage Collector (G1GC)` - Default from java 9+,  Efficient for multi-threaded, low-pause apps, high throughput, low latency
+    2. Serial GC (single-threaded, small apps)
+    3. Parallel GC (max throughput)
+    4. CMS (Concurrent Mark-Sweep) (deprecated)
+    5. ZGC (low latency)
+    6. Shenandoah GC (ultra low pause)
 
 - **When Does an Object Become Eligible for GC?**
-- Its reference is set to null
-- It goes out of scope
-- It forms an island of isolation (cyclic garbage)
+    - Its reference is set to null
+    - It goes out of scope
+    - It forms an island of isolation (cyclic garbage)
 
 - **Can You Force Garbage Collection?**
-- Not exactly.
-- You can request it, but JVM may ignore it.
+    - Not exactly.
+    - You can request it, but JVM may ignore it.
 
 - **Benefits of Garbage Collection**
-- Reduces memory leaks
-- Simplifies development (no manual free() like C)
-- Prevents many memory-related crashes
+    - Reduces memory leaks
+    - Simplifies development (no manual free() like C)
+    - Prevents many memory-related crashes
 
--**Limitations**
-- GC pauses (stop-the-world events)
-- Overhead of running GC cycles
-- Not deterministic → can't predict exactly when GC will run
+- **Limitations**
+    - GC pauses (stop-the-world events)
+    - Overhead of running GC cycles
+    - Not deterministic → can't predict exactly when GC will run
