@@ -135,21 +135,22 @@ CompletableFuture.supplyAsync(() -> fetchData())
 ---
 
 # What is the difference between WeakReference, SoftReference, PhantomReference?
-- WeakReference → “I want it cached but it’s OK if it disappears.”
-- SoftReference → “Keep it as long as memory is healthy.”
-- PhantomReference → “Tell me exactly when it’s gone so I can clean up.”
+- **StrongReference** -> StrongReference tells Garbage collector don't delete the object in heap memory as i have refernece of the obj stored in stack 
+- **WeakReference** → WeakReference says i have access, I have a obj stored in the Heap, but when JVM runs Garbage collector the GC can delete the obj and when i refer to the obj i get null value, “I want it cached but it’s OK if it disappears.”
+    1. **SoftReference** → GC is allowed to free up the obj even though i have soft refernce but only when there is no more space and you have to create a space, then GC can remove that obj from heap. “Keep it as long as memory is healthy.”
+    2. PhantomReference → “Tell me exactly when it’s gone so I can clean up.”
 ---
 
 #  Difference between HashMap, HashTable, and ConcurrentHashMap
 
 | Feature              | HashMap                                            | Hashtable                                  | ConcurrentHashMap                                               |
 |----------------------|-----------------------------------------------------|---------------------------------------------|------------------------------------------------------------------|
-| Thread Safety        | Not thread-safe.                                   | Thread-safe (Legacy).                       | Thread-safe (Optimized).                                        |
-| Synchronization      | None.                                              | Synchronized (`Method-level lock`).           | Locking only on updated segments/bins (`Lock Striping`/CAS).       |
-| Performance          | High (fastest for single-threaded).                | Low (synchronization overhead for all ops). | High (minimizes contention).                                     |
-| Null Key/Value       | Allows one null key and multiple null values.      | Does not allow null keys or values.         | Does not allow null keys or values.                              |
-| Fail-Fast Iterator   | Yes.                                               | No (Fail-safe iteration not guaranteed).    | Yes (weakly consistent iterators).                               |
-| Legacy               | No (introduced in Java 1.2).                       | Yes (original Java utility).                | No (introduced in Java 5).                                       |
+| **Thread Safety**        | Not thread-safe.                                   | Thread-safe (Legacy).                       | Thread-safe (Optimized).                                        |
+| **Synchronization**      | None.                                              | Synchronized (`Method-level lock`).           | Locking only on updated segments/bins (`Lock Striping`/CAS).       |
+| **Performance**          | High (fastest for single-threaded).                | Low (synchronization overhead for all ops). | High (minimizes contention).                                     |
+| **Null Key/Value**       | Allows one null key and multiple null values.      | Does not allow null keys or values.         | Does not allow null keys or values.                              |
+| **Fail-Fast Iterator**   | Yes.                                               | No (Fail-safe iteration not guaranteed).    | Yes (weakly consistent iterators).                               |
+| **Legacy**               | No (introduced in Java 1.2).                       | Yes (original Java utility).                | No (introduced in Java 5).                                       |
 
 
 ```Java
