@@ -27,15 +27,31 @@
 
 # Explain ThreadLocal – how it works internally, pitfalls.
 - A ThreadLocal gives **each thread its own private variable**, not shared with other threads.
-- EX: Think of ThreadLocal like a locker room:
-    - Each thread has its own locker
-    - Same variable name, but each thread gets its own copy
-    - Threads cannot see each other’s values
-    ```
-        ThreadLocal<String> threadLocal = new ThreadLocal<>();
-        threadLocal.set("value for this thread");
-        String value = threadLocal.get();
-    ```     
+```Java
+public class ThreadLocalExample {
+    private static final ThreadLocal<String> threadSpecificData = new ThreadLocal<>();
+
+    public static void main(String[] args) {
+        Runnable task1 = () -> {
+            threadSpecificData.set("Data for Thread 1");
+            System.out.println(Thread.currentThread().getName() + ": " + threadSpecificData.get());
+            threadSpecificData.remove(); // Clean up
+        };
+
+        Runnable task2 = () -> {
+            threadSpecificData.set("Data for Thread 2");
+            System.out.println(Thread.currentThread().getName() + ": " + threadSpecificData.get());
+            threadSpecificData.remove(); // Clean up
+        };
+
+        Thread thread1 = new Thread(task1, "Thread-1");
+        Thread thread2 = new Thread(task2, "Thread-2");
+
+        thread1.start();
+        thread2.start();
+    }
+}
+```
 
 **How It Works Internally (ThreadLocalMap)**
 - Internally, ThreadLocal stores values using a hash map specific to each thread called the **ThreadLocalMap**
@@ -170,3 +186,9 @@ for (Map.Entry<Integer, String> m : ht.entrySet()) { // ht.entrySet()→ returns
 ```
 ---
 
+# Difference between volatile keyword and synchronized
+- volatile
+    - Ensures visibility of changes to variables across threads
+    - No locking, doesn’t block threads
+- synchronized
+    - Acquires a lock, only one thread can enter
