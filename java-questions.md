@@ -192,3 +192,38 @@ for (Map.Entry<Integer, String> m : ht.entrySet()) { // ht.entrySet()→ returns
     - No locking, doesn’t block threads
 - synchronized
     - Acquires a lock, only one thread can enter
+
+---
+# Deep copy vs Shallow copy
+There are two ways to duplicate objects
+1. **Deep copy**  copy everything (full duplication).
+    - A mechanism to copy an object and all its related objects
+    - Deep copy visits all the graph of the refernced objects and copies them, which can be costly because it is hard to know the cost in advance
+
+2. **Shallow Copy**(surface-level copy (doesn’t go inside).)
+    - just copies the current object, If this object is referencing more objects they are not copied
+    - it is the default behaviour
+---
+
+# How does the Java memory model work (Heap, Stack, Metaspace)?
+- Java divides memory into different areas so the JVM can effectively manage objects, method calls, class info and runtime data
+1. **Heap**  
+    - Objects created with `new`, Arrays, Instance variables are stored in heap
+    - Shared accross `all threads`
+    - Managed by the `GC`
+    - Divided into:
+        - Young Generation(Eden + Survivor space)
+        - Old Generation
+    
+2. **Stack**
+    - Method call frames, Local variables (Primitives + object references), Return addresses are stored in stack
+    - Each thread has its `own stack`
+    - Very fast allocation/deallocation
+    - No GC needed
+
+3. **MetaSpace**
+    - `Class definitions`, Method metadata, Runtime constant pool(literals, string references, method references) are stored 
+    - `Replaced premGen` in java 8+
+    - uses native memory(outside the heap)
+    - Automatically grows unless capped
+    - Cleaner and less error-prone than PremGen
