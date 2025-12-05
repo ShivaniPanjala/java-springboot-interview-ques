@@ -233,7 +233,7 @@ There are two ways to duplicate objects
 ConcurrentHashMap<string, Integer> map = new ConcurrentHashMap()
 ```
 
-- **In java 7**
+## In java 7
 - Used `Segments` (an array of smaller hashmaps).
 - `segment based locking` -> 16 segments by default-> entier ConcurrentHashMap is divide into 16 hashmaps
 - 16 segments have `independent lock (ReentrantLock)`, i.e., every segment has its own lock, so threads could operate on different segments in parallel
@@ -247,7 +247,7 @@ ConcurrentHashMap<string, Integer> map = new ConcurrentHashMap()
     - Many keys may cluster into a single segment → more waiting → reduced concurrency.
 
 
-- **In java 8**
+## In java 8
 - `No Segmentation`
     - Java 8 completely removed segments.
     - Why?
