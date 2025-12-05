@@ -227,3 +227,58 @@ There are two ways to duplicate objects
     - uses native memory(outside the heap)
     - Automatically grows unless capped
     - Cleaner and less error-prone than PremGen
+
+# Explain the internal working of ConcurrentHashMap in Java 8.
+```java 
+ConcurrentHashMap<string, Integer> map = new ConcurrentHashMap()
+```
+
+- **In java 7**
+- Used `Segments` (an array of smaller hashmaps).
+- `segment based locking` -> 16 segments by default-> entier ConcurrentHashMap is divide into 16 hashmaps
+- 16 segments have `independent lock (ReentrantLock)`, i.e., every segment has its own lock, so threads could operate on different segments in parallel
+- only the segment being written to or read from is locked
+    - suppose we need to read from a map or update/put in a map, we will do that in a particular segment,  only that particular segment will be locked, other segments will not be blocked
+- **read:** do not require locking unless there is a write operation happening on the same segment
+- **write:** (put/update/remove) require locking the entire segment.
+- **Drawbacks of Segmentation**
+    - Scalability is limited to a fixed number of segments (default 16).
+    - If the HashMap grows large, each segment also becomes large.
+    - Many keys may cluster into a single segment → more waiting → reduced concurrency.
+
+
+- **In java 8**
+- `No Segmentation`
+    - Java 8 completely removed segments.
+    - Why?
+        - 16 segments limit scalability.
+        - Large maps mean large segments → more contention.
+        - Finer-grained locking was needed.
+
+- `Each bucket` stores either:
+    - A `linked list of nodes` (few collisions)
+    - A `tree (Red-Black Tree)` if too many collisions happen
+
+- **Lock-Free Reads**: - completely lock-free -> This greatly improves concurrency.
+
+- **write:** uses `Compare and Swap approach(CAS)` -> `no locking except resizing or collision`
+    - Ex: 
+        - Thread A last saw x = 42.
+        - Thread A wants to update it to 50.
+        - CAS: if x is still 42 → change to 50;
+            - otherwise retry.
+    
+    -  In HashMap Terms:
+        - When putting a value, CAS checks whether the bucket (index) is unchanged.
+        - If it is unchanged → insert/update.
+        - If changed (collision/resizing) → fallback to synchronization. 
+
+- **resizing**
+    - when 0.75% of capacity is reached then resizing is done
+    - the resizing of concurrent hashmap and conevnetional hashmap is different
+        - the interenal array of the hashmap is different
+        - the internal array in the map is doubled imediately as soon as it exceeds the threshold
+        - things don't double in the internal hashmap, it happens step by step, incremental resizing happens
+        - suppose there are 4 buckets and resizing is happend and added 1 more bucket then it possible two threads are comming and try to hold the same bucket it will be necessary to apply a lock so taht is why locking is done in case of resizing and collision
+
+----
