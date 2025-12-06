@@ -297,3 +297,79 @@ ConcurrentHashMap<string, Integer> map = new ConcurrentHashMap()
 | **Use Case**                   | Simple mutual exclusion                        | Advanced locking with flexibility             | High concurrency scenarios (many readers, few writers) |
 | **Performance**                | Slightly lower under high contention           | Higher under high contention                  | Highest for read-heavy workloads           |
 ---
+
+# How does Java handle memory leaks and how would you detect them?
+- Java has `automatic garbage collection`, which means it cleans up memory for you.
+- But a memory leak can still happen if your program `keeps a reference` to an object even when you’re done using it.
+- Because the object is still “reachable,” Java’s garbage collector `cannot remove it`, so memory slowly fills up.
+
+- **What causes Memory leaks:**
+    - Keeping `objects in a List or Map` and never removing them
+    - `Static variables` holding objects forever
+    - Forgetting to `remove listeners or observers`
+    - `unclosed resources` - Not closing things like files, streams, or database connections
+    - `Avoid string concatenation` and use string builder
+    -  `ThreadLocal` causes memory leaks because its values stay attached to long-lived threads (like thread-pool threads), preventing the garbage collector from freeing them
+
+
+- **How to Detect Memory Leaks**
+    - `Heap Dump Analysis` (Eclipse MAT / VisualVM)
+    - `Monitor Memory Trends` 
+        - Watch if memory usage keeps going up and up over time
+        - If `memory keeps growing and doesn’t go down after GC,` that’s a leak
+    - `Analyze GC Logs` (Frequent Full GCs, Increasing Old Gen occupancy, Enable GC logs and check if the heap grows continuously despite GC)
+    - Symptoms:
+        - Increasing heap usage over time
+        - Frequent GC cycles with little memory freed
+        - Eventually, `OutOfMemoryError`
+ 
+---
+# How would you design a thread-safe singleton in Java?
+```java
+// Double checked Locking
+public class Singleton{
+    private static volatile Singleton instance; // Without volatile, instruction reordering can cause another thread to get a partially constructed Singleton instance, breaking thread safety.
+    private Singleton() {}
+
+    public static Singleton getInstance(){
+        if (instance == null) { //1st check no lock
+            synchronized(Singleton.class) {
+                if (instance == null) { // 2nd check with lock
+                    instance = new Singleton(); 
+                }
+            }
+        }
+        return instance;
+    }
+}
+
+```
+---
+# Explain garbage collection tuning?
+- Garbage collection tuning is the process of configuring the JVM and its GC to `optimize performance, pause times, and memory usage` for your application.
+
+- **GC Tuning Strategy**
+    1. Set initial and max heap sizes close to expected usage to avoid frequent resizing.
+    2. Choose GC algorithm based on workload:
+        - Throughput → Parallel GC
+        - Low latency → G1 / ZGC / Shenandoah
+    3. Monitor GC pause times and heap usage.
+    4. Adjust pause time goals, heap sizes, and metaspace as needed.
+    5. Use profiling tools to detect memory leaks or inefficient memory usage.
+
+- Main Areas to tune :
+    - **HeapSize** (-Xms: initial heap size, -Xmx: Maximum heap size)
+    - **Metaspace**
+        - -XX:MaxMetaspaceSize → maximum size for class metadata
+        - `Prevents classloader leaks` from causing OutOfMemoryError: Metaspace
+    - **GC Algorithm Selection**
+        - G1GC, Parallel GC, ZGC, Shenandoah GC
+        - Selected using JVM flags, e.g., `-XX:+UseG1GC or -XX:+UseZGC`.
+    - **Pause time goals**
+        - -XX:MaxGCPauseMillis=200 (GC tries to complete collection within ~200ms to avoid long application freezes.)
+    - **GC Logging & Monitoring**
+        - enable `-Xlog:gc*:file=gc.log:time,uptime,level`
+    - Tools to analyze:
+        - VisualVM, JConsole, Java Mission Control (JMC), Eclipse MAT (for memory leaks)
+---
+

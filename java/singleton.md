@@ -119,7 +119,7 @@ public class Singleton {
     
     ```java
     public class Singleton{
-        private static Singleton instance;
+        private static volatile Singleton instance; // Without volatile, instruction reordering can cause another thread to get a partially constructed Singleton instance, breaking thread safety.
         private Singleton() {}
 
         public static Singleton getInstance() {
