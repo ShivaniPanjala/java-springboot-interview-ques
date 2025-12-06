@@ -283,4 +283,17 @@ ConcurrentHashMap<string, Integer> map = new ConcurrentHashMap()
 
 ----
 
-#
+# Difference between synchronized, ReentrantLock and ReadWriteLock
+| Feature / Aspect              | `synchronized`                                  | `ReentrantLock`                                | `ReadWriteLock`                             |
+|-------------------------------|-------------------------------------------------|-----------------------------------------------|--------------------------------------------|
+| **Type**                      | Built-in Java keyword                           | Class in `java.util.concurrent.locks`        | Interface in `java.util.concurrent.locks`  |
+| **Lock Type**                  | Intrinsic (monitor)                             | Explicit lock                                 | Read and write locks                        |
+| **Reentrancy**                 | Yes                                             | Yes                                           | Yes (for both read and write locks)        |
+| **Fairness Policy**            | No                                              | Optional (true/false in constructor)         | Optional (depends on implementation)       |
+| **Lock Acquisition / Release** | Implicit (via entering/exiting synchronized block) | Explicit (`lock()` / `unlock()`)             | Explicit (`readLock()/writeLock().lock()` / `unlock()`) |
+| **Interruptible Lock**         | No                                              | Yes (`lockInterruptibly()`)                   | Yes (via `lockInterruptibly()` on read/write locks) |
+| **Try Lock**                   | No                                              | Yes (`tryLock()` with optional timeout)      | Yes (for both read and write locks)        |
+| **Condition Support**          | Implicit via `wait()` / `notify()` / `notifyAll()` | Yes (`newCondition()`)                        | Yes (via read/write lock's condition)      |
+| **Use Case**                   | Simple mutual exclusion                        | Advanced locking with flexibility             | High concurrency scenarios (many readers, few writers) |
+| **Performance**                | Slightly lower under high contention           | Higher under high contention                  | Highest for read-heavy workloads           |
+---
