@@ -162,7 +162,7 @@ The `tryLock()` method allows a thread to attempt to acquire a lock without wait
       * If acquired within the timeout, it returns `true`; otherwise, it returns `false` and continues execution.
 
       ```java
-              private static ReentrantLock lock = new ReentrantLock();
+        private static ReentrantLock lock = new ReentrantLock();
 
         private static void accessResource throws InterruptedException() {
         
@@ -186,12 +186,10 @@ The `tryLock()` method allows a thread to attempt to acquire a lock without wait
       * The basic `tryLock()` method **does not honor fairness** and will attempt to "barge in".
 
       ```java
-        private static ReentrantLock lock = new ReentrantLock();
-
-        private static void accessResource {
-        
-            boolean lockAcquired = lock.tryLock(); // doesn't honor fairness
-        }
+            private static ReentrantLock lock = new ReentrantLock();
+            private static void accessResource {
+                boolean lockAcquired = lock.tryLock(); // doesn't honor fairness
+            }
         ```
 
     
@@ -214,3 +212,93 @@ These methods are primarily used for debugging and testing:
 
   * `isHeldByCurrentThread()`: Returns `true` if the current thread holds the lock.
   * `getWaitQueueLength()`: Returns the number of threads currently waiting on the lock.
+
+## Lock's Conditional Class
+
+**Wait and Signal**
+```java
+Lock lock = new ReentrantLock(); 
+
+// 2. Create a Condition object tied to that Lock
+Condition condition = lock.newCondition();
+```
+- The Condition class provides an essential thread coordination mechanism:
+    - **Await (Wait State):** If a thread cannot move forward because a specific condition is not met (e.g., a queue is empty), it calls `condition.await()`.
+        - The thread immediately releases the lock it holds and goes into a blocked state.
+    - **Signal (Wake-up):** A second thread, after performing operations that fulfill the condition (e.g., adding data to the queue), calls `condition.signal()` or `condition.signalAll()`.
+        - The Java Virtual Machine (JVM) finds the waiting thread(s) and moves them from the wait state to the runnable state.
+        - The awakened thread must reacquire the lock before it can resume execution from the point where it was suspended.
+- **Fairness in Signaling**
+    - **condition.signal():** Wakes up only one thread, typically the one that has been waiting the longest (First-In, First-Out fairness).
+
+    - **condition.signalAll():** Wakes up all threads waiting on that specific Condition.
+- Handling Spurious Wake-Ups 
+    - A spurious wake-up happens when a `thread wakes from await() without a signal`.
+    - To handle it, always call `condition.await() inside a while loop` that checks the condition.
+    - Example:
+        ```java
+        lock.lock();
+        try {
+            while (!conditionMet) {
+                condition.await();
+            }
+            // proceed when condition is satisfied
+        } finally {
+            lock.unlock();
+        }
+        ```
+- Example:
+```java
+// added: Signals consumer that the producer has added data.
+// removed: Signals producer that the consumer has removed data (making space)
+
+
+Lock lock = new ReentrantLock(); 
+Condition added = lock.newCondition();  // Condition for data being added
+Condition removed = lock.newCondition(); // Condition for space being made
+int count = 0; // Shared resource
+
+// --- Producer Thread ---
+public void produce() {
+    lock.lock();
+    try {
+        // Wait for space to be available
+        while (count == MAX) { // MAX is the maximum queue capacity
+            removed.await(); // Wait for consumer signal
+        }
+        // ... produce data (count increases) ...
+
+        // Signal the consumer that data is available
+        added.signal();
+
+    } finally {
+        lock.unlock();
+    }
+}
+
+// --- Consumer Thread ---
+public void consume() {
+    lock.lock();
+    try {
+        // Wait for data to be available
+        while (count == 0) { 
+            added.await(); // Wait for producer signal
+        }
+        // ... consume data (count decreases) ...
+
+        // Signal the producer that space is available
+        removed.signal(); 
+
+    } finally {
+        lock.unlock();
+    }
+}
+
+```
+
+| Feature              | synchronized Keyword          | Lock + Condition Class        |
+|----------------------|--------------------------------|--------------------------------|
+| Locking Context      | `synchronized` block or method | Must be called after `lock.lock()` |
+| Wait (Suspend)       | `monitor.wait()`               | `condition.await()`            |
+| Notify One Thread    | `monitor.notify()`             | `condition.signal()`           |
+| Notify All Threads   | `monitor.notifyAll()`          | `condition.signalAll()`        |
