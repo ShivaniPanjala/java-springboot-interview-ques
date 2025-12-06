@@ -220,19 +220,20 @@ sequenceDiagram
     participant thread1 as thread-1
     participant thread2 as thread-2
 
-    %% Threads enter wait-state (no arrow since they are blocked)
+    %% Threads enter wait-state (no arrows)
     Note over thread0: Wait-state (block) aka wait-sets
     Note over thread1: Wait-state (block) aka wait-sets
 
-    %% thread-1 calls await
-    thread1->>thread1: condition.await()
+    %% thread-1 calls await (still blocked)
+    Note over thread1: condition.await()
 
     %% thread-2 signals all waiting threads
     thread2->>thread2: condition.signalAll()
 
     %% Threads become runnable
-    thread0-->>thread0: Runnable
-    thread1-->>thread1: Runnable
+    thread0->>thread0: Runnable
+    thread1->>thread1: Runnable
+
 
 ```
 
