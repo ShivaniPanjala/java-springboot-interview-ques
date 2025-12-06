@@ -214,6 +214,20 @@ These methods are primarily used for debugging and testing:
   * `getWaitQueueLength()`: Returns the number of threads currently waiting on the lock.
 
 ## Lock's Conditional Class
+```mermaid
+sequenceDiagram
+    participant thread0 as thread-0
+    participant thread1 as thread-1
+    participant thread2 as thread-2
+
+    thread0->>thread0: Wait-state (block) aka wait-sets
+    thread1->>thread1: Wait-state (block) aka wait-sets
+    thread1->>thread1: condition.await()
+    thread2->>thread2: condition.signalAll()
+
+    thread0-->>thread0: Runnable
+    thread1-->>thread1: Runnable
+```
 
 **Wait and Signal**
 ```java
