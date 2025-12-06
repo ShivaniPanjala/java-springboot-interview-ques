@@ -282,3 +282,5 @@ ConcurrentHashMap<string, Integer> map = new ConcurrentHashMap()
         - suppose there are 4 buckets and resizing is happend and added 1 more bucket then it possible two threads are comming and try to hold the same bucket it will be necessary to apply a lock so taht is why locking is done in case of resizing and collision
 
 ----
+
+#
