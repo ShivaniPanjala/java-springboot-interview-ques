@@ -325,3 +325,65 @@ public void consume() {
 | Wait (Suspend)       | `monitor.wait()`               | `condition.await()`            |
 | Notify One Thread    | `monitor.notify()`             | `condition.signal()`           |
 | Notify All Threads   | `monitor.notifyAll()`          | `condition.signalAll()`        |
+---
+
+# ReadWriteLock
+- **Read Lock (Shared Access)**
+    - Allows multiple threads (readers) to acquire the lock simultaneously
+    - better performance, especially when reads are frequent
+- **Write Lock (Exclusive Access)**
+    - The same as ReentrantLock—only a single thread (writer) can acquire the lock at a time
+- If a write lock is held, no read locks are permitted, and vice versa
+
+```java
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
+import java.util.concurrent.locks.Lock;
+
+public class ReadWriteLockExample {
+    
+    private final ReadWriteLock readWriteLock = new ReentrantReadWriteLock();
+    // Separate Lock objects are retrieved for specific operations
+    private final Lock readLock = readWriteLock.readLock(); 
+    private final Lock writeLock = readWriteLock.writeLock();
+
+    public void readResource() {
+        readLock.lock(); // Shared lock: multiple threads can hold this
+        try {
+            // view the resource 
+            System.out.println(Thread.currentThread().getName() + " is READING (Shared).");
+        } finally {
+            readLock.unlock();
+        }
+    }
+
+    public void writeResource() {
+        writeLock.lock(); // Exclusive lock: only one thread can hold this
+        try {
+            // update the resource
+            System.out.println(Thread.currentThread().getName() + " is WRITING (Exclusive).");
+        } finally {
+            writeLock.unlock();
+        }
+    }
+
+    public static void main(String[] args) {
+        ReadWriteLockExample obj = new ReadWriteLockExample();
+        
+        // Threads 1 & 2 are Readers (Shared)
+        Thread t1 = new Thread(() -> obj.readResource(), "Reader-1"); t1.start();
+        Thread t2 = new Thread(() -> obj.readResource(), "Reader-2"); t2.start();
+        
+        // Threads 3 & 4 are Writers (Exclusive)
+        Thread t3 = new Thread(() -> obj.writeResource(), "Writer-3"); t3.start();
+        Thread t4 = new Thread(() -> obj.writeResource(), "Writer-4"); t4.start();
+    }
+}
+```
+- **Wait Queue and Lock Starvation**
+    - Problem: If reading is constantly ongoing or new reader threads keep arriving, a waiting writer thread might never get a chance to acquire the exclusive write lock
+    - Solution:
+        - The ReentrantReadWriteLock implementation does not allow new reader threads to jump in once a writer is waiting in the queue 
+        1.  Existing readers complete their tasks 
+        2. The waiting writer is allowed to acquire the lock next
+        3. Only after the writer is done, will the newly waiting readers be allowed to proceed
